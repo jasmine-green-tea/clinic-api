@@ -1,0 +1,6 @@
+[tool.ruff]
+
+src = [".", "app", "app/models", "app/repositories", "app/services", "app/schemas", "app/api"]
+
+[tool.ruff.lint]
+ignore = ["E402", "F401", "F403"]
