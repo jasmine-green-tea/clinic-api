@@ -63,3 +63,19 @@ def get_patient_appointments(
         return appointment_service.get_patient_appointments(patient_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+# Отменить запись и освободить слот
+@router.delete("/appointments/{appointment_id}")
+def cancel_appointment(
+    appointment_id: int,
+    appointment_service: AppointmentService = Depends(get_appointment_service)
+):
+    try:
+        result = appointment_service.cancel_appointment(appointment_id)
+        return {
+            "success": True,
+            "message": "Запись успешно отменена",
+            "data": result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

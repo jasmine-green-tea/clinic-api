@@ -42,6 +42,6 @@ class TimeSlotService:
     def get_time_slots_by_schedule(self, schedule_id: int) -> List[TimeSlotsResponse]:
         time_slots = self.timeslot_repo.get_by_schedule(schedule_id)
         return [TimeSlotsResponse.model_validate(time_slot) for time_slot in time_slots]
-    
+
     def update_time_slot_status(self, time_slot_id: int, status: SlotStatus) -> Optional[TimeSlot]:
         return self.timeslot_repo.update_time_slot_status(time_slot_id, status)

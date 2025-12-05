@@ -3,7 +3,7 @@ from app.services.timeslot_service import TimeSlotService
 from app.repositories.timeslot_repository import TimeSlotRepository
 from app.repositories.patient_repository import PatientRepository
 from app.models import Appointment, AppointmentStatus, TimeSlot, SlotStatus
-from app.schemas.appointment import AppointmentCreate, AppointmentRead, PatientAppointmentRespose, AppointmentWithDetailsRead
+from app.schemas.appointment import AppointmentCreate, AppointmentRead, PatientAppointmentRespose, AppointmentWithDetailsRead, AppointmentResponse
 from app.schemas.timeslot import TimeSlotResponseWithAppointment
 from typing import Optional, Dict, Any
 from datetime import datetime, date
@@ -143,20 +143,38 @@ class AppointmentService:
     # Получить запись по id
 
     # Отменить запись и освободить слот
-    # def cancel_appointment(self, appointment_id: int) -> Dict[str, Any]:
-    #     try:
-    #         print(f"Отмена записи {appointment_id}")
+    def cancel_appointment(self, appointment_id: int) -> Dict[str, Any]:
+        try:
+            print(f"Отмена записи {appointment_id}")
 
-    #         # 1. Получаем запись
-    #         appointment = self.appointment_repository.get_appointment_by_id(appointment_id)
-    #         if not appointment:
-    #             raise ValueError(f"Запись с ID {appointment_id} не найдена")
+            # 1. Получаем запись
+            appointment = self.appointment_repository.get_appointment_by_id(appointment_id)
+            if not appointment:
+                raise ValueError(f"Запись с ID {appointment_id} не найдена")
 
-    #         # 2. Обновляем статус записи
-    #         updated_appointment = self.appointment_repository.update_appointment_status(
-    #             appointment_id,
-    #             AppointmentStatus.CANCELLED
-    #         )
+            # 2. Обновляем статус записи
+            updated_appointment = self.appointment_repository.update_appointment_status(
+                appointment_id,
+                AppointmentStatus.CANCELLED
+            )
 
-    #         # 3. Освобождаем слот
-    #         updated_time_slot = self.timeslot_repository.
+            # 3. Освобождаем слот
+            updated_time_slot = self.timeslot_service.update_time_slot_status(
+                appointment.time_slot_id,
+                SlotStatus.AVAILABLE
+            )
+
+            return {
+                "appointment": AppointmentResponse.from_orm(updated_appointment),
+                "time_slot": TimeSlotResponseWithAppointment(
+                    id=updated_time_slot.id,
+                    schedule_id=updated_time_slot.schedule_id,
+                    start_time=updated_time_slot.start_time,
+                    end_time=updated_time_slot.end_time,
+                    status=updated_time_slot.status,
+                    appointment_id=None
+                )
+            }
+        except Exception as e:
+            print(f"Ошибка отмены записи: {str(e)}")
+            raise

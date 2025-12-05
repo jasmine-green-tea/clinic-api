@@ -54,3 +54,10 @@ class PatientAppointmentsResponse(SQLModel):
     total_appointments: int
     upcoming_appointments: int
     completed_appointments: int
+
+class AppointmentResponse(SQLModel):
+    id: int
+    patient_id: int
+    time_slot_id: int
+    status: AppointmentStatus
+    created_at: datetime
