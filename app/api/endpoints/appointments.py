@@ -65,7 +65,7 @@ def get_patient_appointments(
         raise HTTPException(status_code=400, detail=str(e))
 
 # Отменить запись и освободить слот
-@router.delete("/appointments/{appointment_id}")
+@router.delete("/{appointment_id}")
 def cancel_appointment(
     appointment_id: int,
     appointment_service: AppointmentService = Depends(get_appointment_service)

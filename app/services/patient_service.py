@@ -1,8 +1,8 @@
 from app.repositories.patient_repository import PatientRepository
-from app.schemas.patient import PatientCreate
+from app.schemas.patient import PatientCreate, PatientUpdate, PatientRead
 from app.models import Patient
 from datetime import date
-from typing import List
+from typing import List, Optional
 
 class PatientService:
 
@@ -23,3 +23,20 @@ class PatientService:
 
     def get_all_patients(self) -> List[Patient]:
         return self.patient_repository.get_all()
+
+    # Обновить данные пациента
+    def update_patient(self, patient_id: int, patient_data: PatientUpdate) -> Optional[PatientRead]:
+        try:
+            patient = self.patient_repository.update_patient(patient_id, patient_data)
+            if not patient:
+                return None
+
+            # Получаем обновленную статистику
+            stats = self.patient_repository.get_patient_with_stats(patient_id)
+            patient_response = PatientRead.from_orm(patient)
+            if stats:
+                patient_response.appointments_count = stats["appointments_count"]
+
+            return patient_response
+        except Exception as e:
+            raise ValueError(f"Ошибка обновления пациента: {str(e)}")
